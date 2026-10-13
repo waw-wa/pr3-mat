@@ -157,10 +157,37 @@ def run_block_3():
     plt.close()
     print("-> Графік збережено в graphics/block3_system_reliability.png\n")
 
+# ==========================================
+# БЛОК 4: Варіант 8 (API Rate Limiter)
+# ==========================================
+def run_block_4():
+    print("=== БЛОК 4: Професійна задача (Варіант 8 - API Rate Limiter) ===")
+    N = 100000
+    p_L1 = 0.20 # Перший запит перевищує ліміт
+    p_L2 = 0.30 # Другий запит перевищує ліміт
 
+    p_theory = p_L1 + p_L2 - (p_L1 * p_L2) # 0.44
+
+    rejected_count = 0
+    for _ in range(N):
+        l1_exceeded = (random.random() < p_L1)
+        l2_exceeded = (random.random() < p_L2)
+
+        if l1_exceeded or l2_exceeded:
+            rejected_count += 1
+
+    w_stat = rejected_count / N
+    error = abs(w_stat - p_theory)
+
+    print(f"Кількість пар запитів (N): {N}")
+    print(f"Кількість відхилених пар:  {rejected_count}")
+    print(f"Статистична частота W:     {w_stat:.5f}")
+    print(f"Теоретична ймовірність P:  {p_theory:.5f}")
+    print(f"Абсолютна похибка:         {error:.5f}\n")
 
 if __name__ == "__main__":
     random.seed(12)
     run_block_1()
     run_block_2()
     run_block_3()
+    run_block_4()
