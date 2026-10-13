@@ -67,6 +67,52 @@ def run_block_1():
     plt.close()
     print("-> Графік збережено в graphics/block1_conditional_prob.png\n")
 
+# ==========================================
+# БЛОК 2: Варіант 2 (Двофакторна автентифікація 2FA)
+# ==========================================
+def run_block_2():
+    print("=== БЛОК 2: Варіант 2 (Двофакторна автентифікація 2FA) ===")
+    N = 100000
+    p_S1 = 0.85          # Пароль введено вірно (подія A)
+    p_S2_given_S1 = 0.90 # Push підтверджено (подія B|A)
+
+    count_A = 0
+    count_B = 0
+    count_A_and_B = 0
+    count_A_or_B = 0
+    count_notA_or_notB = 0
+
+    for _ in range(N):
+        event_A = (random.random() < p_S1)
+        event_B = False
+        if event_A:
+            event_B = (random.random() < p_S2_given_S1)
+
+        if event_A:
+            count_A += 1
+        if event_B:
+            count_B += 1
+        if event_A and event_B:
+            count_A_and_B += 1
+        if event_A or event_B:
+            count_A_or_B += 1
+        if (not event_A) or (not event_B):
+            count_notA_or_notB += 1
+
+    w_A_and_B = count_A_and_B / N
+    w_B = count_B / N
+    w_A_or_B = count_A_or_B / N
+    w_A_given_B = count_A_and_B / count_B if count_B > 0 else 0
+    w_notA_or_notB = count_notA_or_notB / N
+
+    print(f"P(A ∩ B)                     = {w_A_and_B:.4f} (Теорія = 0.7650)")
+    print(f"P(B)                         = {w_B:.4f} (Теорія = 0.7650)")
+    print(f"P(A ∪ B)                     = {w_A_or_B:.4f} (Теорія = 0.8500)")
+    print(f"P(A|B)                       = {w_A_given_B:.4f} (Теорія = 1.0000)")
+    print(f"P(~A ∪ ~B) [Відмова]         = {w_notA_or_notB:.4f} (Теорія = 0.2350)\n")
+
+
 if __name__ == "__main__":
     random.seed(12)
     run_block_1()
+    run_block_2()
