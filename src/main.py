@@ -23,7 +23,7 @@ def run_block_1():
     p_B_given_A_estimates = []
 
     print(f"{'N':>8} | {'W(A)':>8} | {'W(B)':>8} | {'W(A∩B)':>8} | {'W(A|B)':>8} | {'W(B|A)':>8} | {'Похибка':>8}")
-    print("-" * 75)
+    print("-" * 74)
 
     for N in sample_sizes:
         count_A = 0
@@ -111,8 +111,56 @@ def run_block_2():
     print(f"P(A|B)                       = {w_A_given_B:.4f} (Теорія = 1.0000)")
     print(f"P(~A ∪ ~B) [Відмова]         = {w_notA_or_notB:.4f} (Теорія = 0.2350)\n")
 
+# ==========================================
+# БЛОК 3: Надійність серійно-паралельної системи
+# ==========================================
+def run_block_3():
+    print("=== БЛОК 3: Надійність серійно-паралельної системи ===")
+    p1 = 0.98 # LB
+    p2 = 0.90 # Web1
+    p3 = 0.90 # Web2
+    p4 = 0.95 # DB1
+    p5 = 0.95 # DB2
+
+    p_sys_theory = p1 * (1 - (1 - p2) * (1 - p3)) * (1 - (1 - p4) * (1 - p5))
+    sample_sizes = [100, 1000, 10000, 100000, 1000000]
+    w_sys_estimates = []
+
+    print(f"{'N':>8} | {'Успішних':>10} | {'Оцінка W_sys':>12} | {'Теорія P_sys':>12} | {'Похибка':>10}")
+    print("-" * 64)
+
+    for N in sample_sizes:
+        successes = 0
+        for _ in range(N):
+            lb_ok = (random.random() < p1)
+            web_ok = (random.random() < p2) or (random.random() < p3)
+            db_ok = (random.random() < p4) or (random.random() < p5)
+
+            if lb_ok and web_ok and db_ok:
+                successes += 1
+
+        w_sys = successes / N
+        w_sys_estimates.append(w_sys)
+        error = abs(w_sys - p_sys_theory)
+        print(f"{N:>8} | {successes:>10} | {w_sys:>12.6f} | {p_sys_theory:>12.6f} | {error:>10.6f}")
+
+    plt.figure(figsize=(8, 5))
+    plt.axhline(y=p_sys_theory, color="r", linestyle="--", label=f"Теорія P_sys = {p_sys_theory:.6f}")
+    plt.plot(sample_sizes, w_sys_estimates, "go-", label="Оцінка надійності W_sys", markersize=6)
+    plt.xscale("log")
+    plt.title("Блок 3: Збіжність оцінки надійності системи")
+    plt.xlabel("Кількість випробувань N (log scale)")
+    plt.ylabel("Надійність системи")
+    plt.grid(True, which="both", linestyle="--", alpha=0.6)
+    plt.legend()
+    plt.savefig("graphics/block3_system_reliability.png", dpi=300, bbox_inches="tight")
+    plt.close()
+    print("-> Графік збережено в graphics/block3_system_reliability.png\n")
+
+
 
 if __name__ == "__main__":
     random.seed(12)
     run_block_1()
     run_block_2()
+    run_block_3()
